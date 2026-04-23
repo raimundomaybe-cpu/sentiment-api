@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from textblob import TextBlob
+from deep_translator import GoogleTranslator
 
 app = FastAPI()
 
@@ -9,7 +10,10 @@ def home():
 
 @app.get("/analisar")
 def analisar(texto: str):
-    analise = TextBlob(texto)
+    # Traduzir para inglês
+    texto_en = GoogleTranslator(source='auto', target='en').translate(texto)
+
+    analise = TextBlob(texto_en)
     polaridade = analise.sentiment.polarity
 
     if polaridade > 0:
