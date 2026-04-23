@@ -1,10 +1,7 @@
 from fastapi import FastAPI
-from transformers import pipeline
+from textblob import TextBlob
 
 app = FastAPI()
-
-classifier = pipeline("sentiment-analysis",
-                      model="nlptown/bert-base-multilingual-uncased-sentiment")
 
 @app.get("/")
 def home():
@@ -12,13 +9,14 @@ def home():
 
 @app.get("/analisar")
 def analisar(texto: str):
-    resultado = classifier(texto)[0]["label"]
+    analise = TextBlob(texto)
+    polaridade = analise.sentiment.polarity
 
-    if "1" in resultado or "2" in resultado:
-        sentimento = "NEGATIVO"
-    elif "3" in resultado:
-        sentimento = "NEUTRO"
-    else:
+    if polaridade > 0:
         sentimento = "POSITIVO"
+    elif polaridade < 0:
+        sentimento = "NEGATIVO"
+    else:
+        sentimento = "NEUTRO"
 
     return {"sentimento": sentimento}
